@@ -3,21 +3,56 @@
 
 template <typename T> class Node {
 public:
-  Node();
-  Node(T val);
-  ~Node();
+  Node() {
+    left = nullptr;
+    right = nullptr;
+    next = nullptr;
+  }
 
-  void setValue(T val);
-  T getValue();
+  Node(T val) {
+    value = val;
+    left = nullptr;
+    right = nullptr;
+    next = nullptr;
+  }
 
-  void setLeft(Node<T>* &node);
-  Node<T>* &getLeft();
+  ~Node() {
+    left = nullptr;
+    right = nullptr;
+    next = nullptr;
+  }
 
-  void setRight(Node<T>* &node);
-  Node<T>* &getRight();
+  void setValue(T val) {
+    value = val;
+  }
 
-  void setNext(Node<T>* &node);
-  Node<T>* &getNext();
+  T getValue() {
+    return value;
+  }
+
+  void setLeft(Node<T>* &node) {
+    left = node;
+  }
+
+  Node<T>* &getLeft() {
+    return left;
+  }
+
+  void setRight(Node<T>* &node) {
+    right = node;
+  }
+
+  Node<T>* &getRight() {
+    return right;
+  }
+
+  void setNext(Node<T>* &node) {
+    next = node;
+  }
+
+  Node<T>* &getNext() {
+    return next;
+  }
 
 private:
   T value;
