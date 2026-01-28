@@ -1,3 +1,11 @@
+/*
+General use Node class for any type. Designed to be open ended
+and usable for any project which may require nodes.
+
+Author: Luca Ardanaz
+Last Updated: 26/1/2026
+*/
+
 #ifndef NODE_H
 #define NODE_H 
 
@@ -30,27 +38,27 @@ public:
     return value;
   }
 
-  void setLeft(Node<T>* &node) {
+  void setLeft(Node<T>* node) {
     left = node;
   }
 
-  Node<T>* &getLeft() {
+  Node<T>* getLeft() {
     return left;
   }
 
-  void setRight(Node<T>* &node) {
+  void setRight(Node<T>* node) {
     right = node;
   }
 
-  Node<T>* &getRight() {
+  Node<T>* getRight() {
     return right;
   }
 
-  void setNext(Node<T>* &node) {
+  void setNext(Node<T>* node) {
     next = node;
   }
 
-  Node<T>* &getNext() {
+  Node<T>* getNext() {
     return next;
   }
 
