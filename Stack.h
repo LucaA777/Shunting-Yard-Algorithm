@@ -88,6 +88,10 @@ public:
     return current -> getValue();
   }
 
+  bool isEmpty() {
+	  return head == nullptr;
+  }
+
 
 private:
   Node<T>* head;
