@@ -61,6 +61,10 @@ public:
     return value;
   }
 
+  bool isEmpty() {
+    return head == nullptr;
+  }
+
 private:
   Node<T>* head;
 };
