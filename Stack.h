@@ -2,7 +2,7 @@
 General purpose stack implementation using a singly linked list.
 
 Author: Luca Ardanaz
-Last Updated: 26/1/2026
+Last Updated: 27/1/2026
 */
 
 #include "Node.h"
@@ -16,14 +16,15 @@ public:
     head = nullptr;
   }
 
-  Stack(Node<T>* &node) {
-    head = node;
+  Stack(T value) {
+    head = new Node<T>(value);
   }
 
   void push(T value) {
     //empty stack case
     if (head == nullptr) {
       head = new Node<T>(value);
+      return;
     }
 
     Node<T>* current = head;
