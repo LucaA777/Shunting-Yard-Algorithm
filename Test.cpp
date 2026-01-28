@@ -2,6 +2,7 @@
 
 #include "Node.h"
 #include "Stack.h"
+#include "Queue.h"
 
 using namespace std;
 
@@ -22,6 +23,15 @@ int main() {
   stack -> push(47);
   cout << "Stack push 47 pop: " << stack -> pop() << endl;
   cout << "Stack post-pop: " << stack -> peek() << endl;
+
+  Queue<char>* queue = new Queue<char>('a');
+
+  queue -> enqueue('b');
+  queue -> enqueue('c');
+
+  cout << "Alphabet queue dequeue 1: " << queue -> dequeue() << endl;
+  cout << "Aplhabet queue dequeue 2: " << queue -> dequeue() << endl;
+  cout << "Alphabet queue dequeue 3: " << queue -> dequeue() << endl;
 
   return 0;
 }
