@@ -21,6 +21,18 @@ public:
     head = new Node<T>(value);
   }
 
+  ~Stack() {
+	Node<T>* current = head;
+	Node<T>* previous = nullptr;
+
+	//go and delete all of the nodes
+	while (current != nullptr) {
+		previous = current;
+		current = current -> getNext();
+		delete previous;
+	}
+  }
+
   void push(T value) {
     //empty stack case
     if (head == nullptr) {

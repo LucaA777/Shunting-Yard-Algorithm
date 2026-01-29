@@ -21,6 +21,18 @@ public:
     head = new Node<T>(value);
   }
 
+  ~Queue() {
+	Node<T>* current = head;
+	Node<T>* previous = nullptr;
+
+	//go and delete all of the nodes
+	while (current != nullptr) {
+		previous = current;
+		current = current -> getNext();
+		delete previous;	
+	}
+  }
+
   void enqueue(T value) {
     //empty queue case 
     if (head == nullptr) {

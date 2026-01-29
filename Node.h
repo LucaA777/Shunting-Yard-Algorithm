@@ -27,9 +27,10 @@ public:
   }
 
   ~Node() {
-    left = nullptr;
-    right = nullptr;
-    next = nullptr;
+	    left = nullptr;
+	    right = nullptr;
+	    next = nullptr;
+    }
   }
 
   void setValue(T val) {
