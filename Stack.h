@@ -70,7 +70,7 @@ public:
     return value;
     
   }
-
+  
   T peek() {
     //empty stack case 
     if (head == nullptr) {
