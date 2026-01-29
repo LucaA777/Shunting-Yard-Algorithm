@@ -30,19 +30,17 @@ int main() {
 
 	Queue<string>* infix = createInfixFromString(input);
 
-	Queue<string>* postfix = infixToPostfix(infix);
+	Queue<string>* postfix = infixToPostfix(infix -> clone());
 
-	string out;
-	while (!infix -> isEmpty()) {
-		cout << infix -> dequeue() << " ";
-	}
-	cout << endl;
+  cout << "Infix: ";
+  infix -> print();
+  cout << endl;
+  
 
-	while (!postfix -> isEmpty()) {
-		cout << postfix -> dequeue() << " ";
-	}
-	cout << endl;
-
+  cout << "Postfix: ";
+  postfix -> print();
+  cout << endl;
+  
 	return 0;
 }
 
@@ -153,6 +151,11 @@ Queue<string>* infixToPostfix(Queue<string>* infix) {
 		}
 
 	}
+  
+  //end by pushing the stack into the queue
+  while (!stack -> isEmpty()) {
+    output -> enqueue(stack -> pop());
+  }
 
 	return output;
 
