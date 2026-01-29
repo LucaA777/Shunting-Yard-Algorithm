@@ -53,7 +53,14 @@ int main() {
     }
 
     //TODO: add infix, prefix, and postfix conversion from tree
-    
+    if (input == "postfix") {
+      Queue<string>* postfix = infixToPostfix(infix -> clone());
+      cout << "Cheaty postfix: " << endl;
+      postfix -> print();
+      cout << endl;
+      delete postfix;
+      continue; 
+    }
     
     //if the input doesn't match a command, try converting it into an expression
     if (!isValidExpression(input)) {
@@ -90,14 +97,6 @@ Queue<string>* createInfixFromString(string input) {
     //add character to substring
     previousSubstring = substring;
     substring += c;
-
-    //if the previous element is a number and the current symbol is a '-', treat it as a subtraction 
-    if (isNumber(previousElement) && previousSubstring == "-") {
-      output -> enqueue(previousSubstring);
-      substring = c;
-      previousElement = previousSubstring;
-      continue;
-    }
 
     //if the previous substring is a number but the current isn't, it enqueue the number 
     if (isNumber(previousSubstring) && !isNumber(substring)) {
@@ -156,7 +155,6 @@ bool validString(string input) {
 bool isNumber(string input) {
   /*
     Conditions to be a number: 
-      - A negative sign can only be the first character
       - There can only be one decimal point
       - Everything else must be a number
       - Can't be empty
@@ -181,13 +179,8 @@ bool isNumber(string input) {
       input[i] != '7' &&
       input[i] != '8' &&
       input[i] != '9' &&
-      input[i] != '-' &&
       input[i] != '.')
     {
-      return false;
-    }
-    //invalid negative placement check  
-    if (input[i] == '-' && i != 0) {
       return false;
     }
 
