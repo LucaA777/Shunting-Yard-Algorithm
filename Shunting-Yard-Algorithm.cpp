@@ -24,6 +24,7 @@ bool shouldPopStack(string newOperator, string stackOperator);
 Node<string>* postfixToTree(Queue<string>* postfix);
 string toLower(string str);
 void treeToPostfix(Stack<string>* &postfix, Node<string>* node);
+void treeToPrefix(Stack<string>* &prefix, Node<string>* node);
 
 int main() {
 
@@ -48,7 +49,6 @@ int main() {
 			cout << "Equation tree: " << endl;
 			tree -> printTree();
 			cout << endl;
-			delete tree;
 			continue;
 		}
 
@@ -67,6 +67,20 @@ int main() {
 			continue; 
 		}
 
+		if (input == "prefix") {
+			Stack<string>* prefix = new Stack<string>();
+			treeToPrefix(prefix, tree);
+			cout << "Prefix: " << endl;
+
+			while (!prefix -> isEmpty()) {
+				cout << prefix -> pop() << " ";
+			}
+
+			cout << endl;
+			delete prefix;
+			continue;
+		}
+
 		//if the input doesn't match a command, try converting it into an expression
 		if (createInfixFromString(input) == nullptr) {
 			cout << "That is not a valid expression." << endl;
@@ -82,7 +96,7 @@ int main() {
 		cout << "Creating tree..." << endl;
 		tree = postfixToTree(postfix);
 		cout << "Done." << endl;
-		delete postfix;
+//		delete postfix;
 		cout << "Infix: ";
 		infix -> print();
 		cout << endl;
@@ -353,7 +367,6 @@ void treeToPostfix(Stack<string>* &postfix, Node<string>* node) {
 
 	//go down the right branches until reaching the end, then start going left
 	postfix -> push(node -> getValue());
-	cout << node -> getValue() << " ";
 
 	if (node -> getRight() != nullptr) {
 		treeToPostfix(postfix, node -> getRight());
@@ -361,5 +374,18 @@ void treeToPostfix(Stack<string>* &postfix, Node<string>* node) {
 
 	if (node -> getLeft() != nullptr) {
 		treeToPostfix(postfix, node -> getLeft());
+	}
+}
+
+void treeToPrefix(Stack<string>* &prefix, Node<string>* node) {
+	//go down the left branches until reaching the end, then start going right
+	prefix -> push(node -> getValue());
+
+	if (node -> getLeft() != nullptr) {
+		treeToPrefix(prefix, node -> getLeft());
+	}
+
+	if (node -> getRight() != nullptr) {
+		treeToPrefix(prefix, node -> getRight());
 	}
 }
