@@ -22,32 +22,54 @@ bool isNumber(string input);
 Queue<string>* infixToPostfix(Queue<string>* infix);
 bool shouldPopStack(string newOperator, string stackOperator);
 Node<string>* postfixToTree(Queue<string>* postfix);
+string toLower(string str);
+bool isValidExpression(string input);
 
 int main() {
 
-  //basic tester to see if the infix creation works
+  Queue<string>* infix = nullptr;
+  string input = "";
+  //input loop 
+  do {
+    cout << endl << endl;
+    cout << "Enter an expression or a command (TREE, INFIX, PREFIX, POSTFIX, QUIT): " << endl;
+    getline(cin, input);
+    input = toLower(input);
+    
+    if (input == "tree") {
+      //check if the infix has been defined
+      if (infix == nullptr) {
+        cout << "You must enter an expression first." << endl;
+        continue;
+      }
 
-  cout << "Enter an expression (space seperated): " << endl;
-  string input;
-  getline(cin, input);
+      //otherwise, make the tree 
+      Node<string>* tree = postfixToTree(infixToPostfix(infix -> clone()));
+      cout << "Equation tree: " << endl;
+      tree -> printTree();
+      cout << endl;
+      delete tree;
+      continue;
+    }
 
-  Queue<string>* infix = createInfixFromString(input);
+    //TODO: add infix, prefix, and postfix conversion from tree
+    
+    
+    //if the input doesn't match a command, try converting it into an expression
+    if (!isValidExpression(input)) {
+      cout << "That is not a valid expression." << endl;
+      continue;
+    }
 
-  Queue<string>* postfix = infixToPostfix(infix -> clone());
 
-  cout << "Infix: ";
-  infix -> print();
-  cout << endl;
+    //if it is valid, then set it as our infix
+    infix = createInfixFromString(input);
+    cout << "Infix: ";
+    infix -> print();
+    cout << endl;
 
 
-  cout << "Postfix: ";
-  postfix -> print();
-  cout << endl;
-
-  Node<string>* equationTree = postfixToTree(postfix -> clone());
-  cout << "Equation tree: " << endl;
-  equationTree -> printTree();
-  cout << endl;
+  } while (input != "quit");
 
   return 0;
 }
@@ -69,42 +91,51 @@ Queue<string>* createInfixFromString(string input) {
     previousSubstring = substring;
     substring += c;
 
-    //if the previous output was a number and the current character is a '-', output it. 
-    if (previousElement != "" && isNumber(previousElement) && substring == "-") {
-      output -> enqueue(substring);
-      previousElement = substring;
-      substring = "";
-      continue;
+    //if the very first character is not a number or '-', it is invalid
+    if (previousSubstring == "" && !isNumber(substring)) {
+      return nullptr;
     }
+
+   
 
     //if the substring is currently a number, there may be more digits, don't enqueue yet 
     //if the substring isn't a number, but the previous one is, then we must add the previous substring.
     if (!isNumber(substring) && isNumber(previousSubstring)) {
       output -> enqueue(previousSubstring);
-      previousElement = substring;
+      previousElement = previousSubstring;
       //set the current substring to be the current char 
       substring = c;
     }
-
-    //check if the new substring is also valid and not a number  
-    if (validString(substring) && !isNumber(substring)) {
-      output -> enqueue(substring);
-      previousElement = substring;
-      substring = "";
+   
+    //if the previous output was a number and the current character is a '-', output it.
+    //this is so that it becomes a '-' operator and not a negative number  
+    if (previousElement != "" && isNumber(previousElement) && previousSubstring == "-" && isNumber(substring)) {
+      output -> enqueue(previousSubstring);
+      previousElement = previousSubstring;
+      substring = c;
+      continue;
+    }
+    
+    //check if the previous substring is also valid and not a number, and the new substring isn't valid   
+    if (validString(previousSubstring) && !isNumber(substring) && !validString(substring)) {
+      output -> enqueue(previousSubstring);
+      previousElement = previousSubstring;
+      substring = c;
     }
   }
 
-  //add last substring to the output if its not empty
+  //add last substring to the output if its not empty and a number
   if (substring == "") {
     return output;
   }
-  else if (validString(substring)) {
+
+  cout << "Lingering substring: " << substring << endl;
+  if ((isNumber(substring) && substring != "-" && substring != ".") || substring == ")") {
     output -> enqueue(substring);
     return output;
   }
-  else {
-    return new Queue<string>();
-  }
+
+  return nullptr;
 }
 
 bool validString(string input) {
@@ -279,7 +310,19 @@ Node<string>* postfixToTree(Queue<string>* postfix) {
 
     //otherwise, it must be an operator
     //take the last two branches of the tree, and unite them as children of the operator
+    
+    //if there aren't numbers yet, the equation is invalid
+    if (treeStack -> isEmpty()) {
+      return nullptr;
+    }
+
     Node<string>* right = treeStack -> pop();
+    
+    //if there was only one number, the equation is invalid
+    if (treeStack -> isEmpty()) {
+      return nullptr;
+    }
+
     Node<string>* left = treeStack -> pop();
 
     Node<string>* parent = new Node<string>(element);
@@ -290,6 +333,34 @@ Node<string>* postfixToTree(Queue<string>* postfix) {
     treeStack -> push(parent);
   }
 
-  //this assumes that a valid postfix equation was entered
   return treeStack -> pop();
+}
+
+string toLower(string str) {
+  for (char& c : str) {
+    c = (char)tolower(c);
+  }
+
+  return str;
+}
+
+bool isValidExpression(string input) {
+
+  Queue<string>* infix = createInfixFromString(input);
+
+  //if creating a tree returns null, that means that there was an error in the expression 
+  if (infix == nullptr) {
+    cout << "FAILS INFIX CONVERSION" << endl;
+    delete infix;
+    return false; 
+  }
+  
+  if (postfixToTree(infixToPostfix(infix)) != nullptr) {
+    delete infix;
+    return true;
+  }
+
+  cout << "FAILS TREE CREATION" << endl;
+  delete infix;
+  return false;
 }
