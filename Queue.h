@@ -6,6 +6,7 @@ Last Updated: 27/1/2026
 */
 
 #include "Node.h"
+#include <iostream>
 
 #ifndef QUEUE_H 
 #define QUEUE_H 
@@ -63,6 +64,29 @@ public:
 
   bool isEmpty() {
     return head == nullptr;
+  }
+
+  void print() {
+    Node<T>* current = head;
+    
+    //go through each element and print it.
+    while (current != nullptr) {
+      std::cout << current -> getValue() << " ";
+      current = current -> getNext();
+    }
+  }
+
+  Queue<T>* clone() {
+    Queue<T>* newQueue = new Queue<T>();
+
+    //for each element in the queue, make a copy of it and reconstruct the queue 
+    Node<T>* current = head;
+    while (current != nullptr) {
+      newQueue -> enqueue(current -> getValue());
+      current = current -> getNext();
+    }
+
+    return newQueue;
   }
 
 private:
