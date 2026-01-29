@@ -91,37 +91,31 @@ Queue<string>* createInfixFromString(string input) {
     previousSubstring = substring;
     substring += c;
 
-    //if the very first character is not a number or '-', it is invalid
-    if (previousSubstring == "" && !isNumber(substring)) {
-      return nullptr;
-    }
-
-   
-
-    //if the substring is currently a number, there may be more digits, don't enqueue yet 
-    //if the substring isn't a number, but the previous one is, then we must add the previous substring.
-    if (!isNumber(substring) && isNumber(previousSubstring)) {
+    //if the previous element is a number and the current symbol is a '-', treat it as a subtraction 
+    if (isNumber(previousElement) && previousSubstring == "-") {
       output -> enqueue(previousSubstring);
-      previousElement = previousSubstring;
-      //set the current substring to be the current char 
       substring = c;
-    }
-   
-    //if the previous output was a number and the current character is a '-', output it.
-    //this is so that it becomes a '-' operator and not a negative number  
-    if (previousElement != "" && isNumber(previousElement) && previousSubstring == "-" && isNumber(substring)) {
-      output -> enqueue(previousSubstring);
       previousElement = previousSubstring;
-      substring = c;
       continue;
     }
-    
-    //check if the previous substring is also valid and not a number, and the new substring isn't valid   
-    if (validString(previousSubstring) && !isNumber(substring) && !validString(substring)) {
+
+    //if the previous substring is a number but the current isn't, it enqueue the number 
+    if (isNumber(previousSubstring) && !isNumber(substring)) {
       output -> enqueue(previousSubstring);
-      previousElement = previousSubstring;
       substring = c;
+      previousElement = previousSubstring;
+      continue;
     }
+
+    //if the previous substring is valid but the current isn't, enqueue it 
+    if (validString(previousSubstring) && !validString(substring)) {
+      output -> enqueue(previousSubstring);
+      substring = c;
+      previousElement = previousSubstring;
+      continue;
+    }
+
+
   }
 
   //add last substring to the output if its not empty and a number
