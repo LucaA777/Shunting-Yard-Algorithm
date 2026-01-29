@@ -79,7 +79,6 @@ Queue<string>* createInfixFromString(string input) {
 
     //if the substring is currently a number, there may be more digits, don't enqueue yet 
     //if the substring isn't a number, but the previous one is, then we must add the previous substring.
-
     if (!isNumber(substring) && isNumber(previousSubstring)) {
       output -> enqueue(previousSubstring);
       previousElement = substring;
@@ -145,23 +144,7 @@ bool isNumber(string input) {
   bool decimalFound = false;
 
   for (int i = 0; i < input.length(); i++) {
-
-    //invalid negative placement check  
-    if (input[i] == '.' && i != 0) {
-      return false;
-    }
-
-    //decimal point check 
-    if (input[i] == '.' && decimalFound) {
-      return false;
-    }
-
-    //update decimal boolean
-    if (input[i] == '.') {
-      decimalFound = true;
-    }
-
-
+    
     //check whether the character is not in the valid set 
     if (input[i] != '0' &&
       input[i] != '1' &&
@@ -177,6 +160,20 @@ bool isNumber(string input) {
       input[i] != '.')
     {
       return false;
+    }
+    //invalid negative placement check  
+    if (input[i] == '-' && i != 0) {
+      return false;
+    }
+
+    //decimal point check 
+    if (input[i] == '.' && decimalFound) {
+      return false;
+    }
+
+    //update decimal boolean
+    if (input[i] == '.') {
+      decimalFound = true;
     }
   }
 
