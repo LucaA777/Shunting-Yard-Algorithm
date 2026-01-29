@@ -6,6 +6,7 @@ Last Updated: 27/1/2026
 */
 
 #include "Node.h"
+#include <iostream>
 
 #ifndef Stack_H 
 #define Stack_H 
@@ -92,6 +93,15 @@ public:
 	  return head == nullptr;
   }
 
+  void print() {
+    Node<T>* current = head;
+
+    //go through each element and print it 
+    while (current != nullptr) {
+      std::cout << current -> getValue() << " ";
+      current = current -> getNext();
+    }
+  }
 
 private:
   Node<T>* head;
