@@ -23,11 +23,12 @@ Queue<string>* infixToPostfix(Queue<string>* infix);
 bool shouldPopStack(string newOperator, string stackOperator);
 Node<string>* postfixToTree(Queue<string>* postfix);
 string toLower(string str);
-bool isValidExpression(string input);
+void treeToPostfix(Stack<string>* &postfix, Node<string>* node);
 
 int main() {
 
   Queue<string>* infix = nullptr;
+  Node<string>* tree = nullptr;
   string input = "";
   //input loop 
   do {
@@ -38,13 +39,12 @@ int main() {
     
     if (input == "tree") {
       //check if the infix has been defined
-      if (infix == nullptr) {
+      if (tree == nullptr) {
         cout << "You must enter an expression first." << endl;
         continue;
       }
 
       //otherwise, make the tree 
-      Node<string>* tree = postfixToTree(infixToPostfix(infix -> clone()));
       cout << "Equation tree: " << endl;
       tree -> printTree();
       cout << endl;
@@ -54,16 +54,21 @@ int main() {
 
     //TODO: add infix, prefix, and postfix conversion from tree
     if (input == "postfix") {
-      Queue<string>* postfix = infixToPostfix(infix -> clone());
-      cout << "Cheaty postfix: " << endl;
-      postfix -> print();
+      Stack<string>* postfix = new Stack<string>();
+      treeToPostfix(postfix, tree);
+      cout << "Postfix: " << endl;
+      
+      while (!postfix -> isEmpty()) {
+        cout << postfix -> pop() << " ";
+      }
+
       cout << endl;
       delete postfix;
       continue; 
     }
     
     //if the input doesn't match a command, try converting it into an expression
-    if (!isValidExpression(input)) {
+    if (createInfixFromString(input) == nullptr) {
       cout << "That is not a valid expression." << endl;
       continue;
     }
@@ -71,6 +76,7 @@ int main() {
 
     //if it is valid, then set it as our infix
     infix = createInfixFromString(input);
+    tree = postfixToTree(infixToPostfix(infix -> clone()));
     cout << "Infix: ";
     infix -> print();
     cout << endl;
@@ -122,7 +128,6 @@ Queue<string>* createInfixFromString(string input) {
     return output;
   }
 
-  cout << "Lingering substring: " << substring << endl;
   if ((isNumber(substring) && substring != "-" && substring != ".") || substring == ")") {
     output -> enqueue(substring);
     return output;
@@ -148,7 +153,6 @@ bool validString(string input) {
   {
     return true;  
   }
-  cout << "INVALID INPUT" << endl;
   return false;
 }
 
@@ -331,23 +335,17 @@ string toLower(string str) {
   return str;
 }
 
-bool isValidExpression(string input) {
+void treeToPostfix(Stack<string>* &postfix, Node<string>* node) {
 
-  Queue<string>* infix = createInfixFromString(input);
+  //go down the right branches until reaching the end, then start going left
+  postfix -> push(node -> getValue());
+  cout << node -> getValue() << " ";
 
-  //if creating a tree returns null, that means that there was an error in the expression 
-  if (infix == nullptr) {
-    cout << "FAILS INFIX CONVERSION" << endl;
-    delete infix;
-    return false; 
-  }
-  
-  if (postfixToTree(infixToPostfix(infix)) != nullptr) {
-    delete infix;
-    return true;
+  if (node -> getRight() != nullptr) {
+    treeToPostfix(postfix, node -> getRight());
   }
 
-  cout << "FAILS TREE CREATION" << endl;
-  delete infix;
-  return false;
+  if (node -> getLeft() != nullptr) {
+    treeToPostfix(postfix, node -> getLeft());
+  }
 }
