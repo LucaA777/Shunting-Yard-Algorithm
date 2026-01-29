@@ -8,6 +8,7 @@ Last Updated: 27/1/2026
 
 #include "Stack.h"
 #include "Queue.h"
+#include "Node.h"
 
 #include <iostream>
 #include <string>
@@ -15,10 +16,11 @@ Last Updated: 27/1/2026
 
 using namespace std;
 
-bool validString(string input);
 Queue<string>* createInfixFromString(string input);
+bool validString(string input);
 Queue<string>* infixToPostfix(Queue<string>* infix);
 bool shouldPopStack(string newOperator, string stackOperator);
+Node<string>* postfixToTree(Queue<string>* postfix);
 
 int main() {
 
@@ -39,6 +41,11 @@ int main() {
 
   cout << "Postfix: ";
   postfix -> print();
+  cout << endl;
+
+  Node<string>* equationTree = postfixToTree(postfix -> clone());
+  cout << "Equation tree: " << endl;
+  equationTree -> printTree();
   cout << endl;
   
 	return 0;
@@ -185,4 +192,39 @@ bool shouldPopStack(string newOperator, string stackOperator) {
 	return true;
 
 
+}
+
+Node<string>* postfixToTree(Queue<string>* postfix) {
+  Stack<Node<string>*>* treeStack = new Stack<Node<string>*>();
+
+  //go through all of the elements and arrange them into a tree 
+  while (!postfix -> isEmpty()) {
+    //store queue element 
+    string element = postfix -> dequeue();
+
+    //check to see if it's an operand
+    try {
+		  double num = stod(element);
+		  
+      //if so, push to the stack
+      treeStack -> push(new Node<string>(element));
+      continue;
+	  }
+	  catch(...) {}
+
+    //otherwise, it must be an operator
+    //take the last two branches of the tree, and unite them as children of the operator
+    Node<string>* right = treeStack -> pop();
+    Node<string>* left = treeStack -> pop();
+    
+    Node<string>* parent = new Node<string>(element);
+    parent -> setRight(right);
+    parent -> setLeft(left);
+
+    //add this new tree to the stack again
+    treeStack -> push(parent);
+  }
+
+  //this assumes that a valid postfix equation was entered
+  return treeStack -> pop();
 }
