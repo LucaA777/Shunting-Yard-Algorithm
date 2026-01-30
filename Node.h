@@ -30,7 +30,6 @@ public:
 	    left = nullptr;
 	    right = nullptr;
 	    next = nullptr;
-    }
   }
 
   void setValue(T val) {
