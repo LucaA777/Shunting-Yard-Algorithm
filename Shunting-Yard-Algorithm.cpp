@@ -13,6 +13,7 @@ Last Updated: 27/1/2026
 #include <iostream>
 #include <string>
 #include <map>
+#include <cmath>
 
 using namespace std;
 
@@ -26,6 +27,8 @@ string toLower(string str);
 void treeToPostfix(Stack<string>* &postfix, Node<string>* node);
 void treeToPrefix(Queue<string>* &prefix, Node<string>* node);
 void treeToInfix(Queue<string>* &infix, Node<string>* node);
+double solveFromTree(Node<string>* node);
+void deleteTree(Node<string>* node);
 
 int main() {
 
@@ -35,7 +38,7 @@ int main() {
 	//input loop 
 	do {
 		cout << endl << endl;
-		cout << "Enter an expression or a command (TREE, INFIX, PREFIX, POSTFIX, QUIT): " << endl;
+		cout << "Enter an expression or a command (TREE, INFIX, PREFIX, POSTFIX, SOLVE, QUIT): " << endl;
 		getline(cin, input);
 		input = toLower(input);
 
@@ -53,7 +56,6 @@ int main() {
 			continue;
 		}
 
-		//TODO: add infix, prefix, and postfix conversion from tree
 		if (input == "postfix") {
 			Stack<string>* postfix = new Stack<string>();
 			treeToPostfix(postfix, tree);
@@ -82,18 +84,27 @@ int main() {
 			continue;
 		}
 
-    if (input == "infix") {
-      Queue<string>* nInfix = new Queue<string>();
-      treeToInfix(nInfix, tree);
-      cout << "Infix: " << endl;
+		if (input == "infix") {
+			Queue<string>* nInfix = new Queue<string>();
+			treeToInfix(nInfix, tree);
+			cout << "Infix: " << endl;
 
-      while (!nInfix -> isEmpty()) {
-        cout << nInfix -> dequeue() << " ";
-      }
-      cout << endl;
-      delete nInfix;
-      continue;
-    }
+			while (!nInfix -> isEmpty()) {
+				cout << nInfix -> dequeue() << " ";
+		}
+			cout << endl;
+			delete nInfix;
+			continue;
+		}
+
+		if (input == "solve") {
+			cout << " = " << solveFromTree(tree) << endl;
+			continue;
+		}
+
+		if (input == "quit") {
+			continue;
+		}	
 
 		//if the input doesn't match a command, try converting it into an expression
 		if (createInfixFromString(input) == nullptr) {
@@ -103,20 +114,19 @@ int main() {
 
 
 		//if it is valid, then set it as our infix
-		cout << "Creating infix..." << endl;
 		infix = createInfixFromString(input);
-		cout << "Creating postfix..." << endl;
-		Queue<string>* postfix = infixToPostfix(infix -> clone());
-		cout << "Creating tree..." << endl;
+		Queue<string>* postfix = infixToPostfix(createInfixFromString(input) -> clone());
 		tree = postfixToTree(postfix);
-		cout << "Done." << endl;
-//		delete postfix;
-		cout << "Infix: ";
 		infix -> print();
 		cout << endl;
 
 
 	} while (input != "quit");
+
+	delete infix;
+	infix = nullptr;
+	deleteTree(tree);
+	tree = nullptr;
 
 	return 0;
 }
@@ -137,6 +147,15 @@ Queue<string>* createInfixFromString(string input) {
 		//add character to substring
 		previousSubstring = substring;
 		substring += c;
+		
+		//if the previous element was not an operator and the current substring is a minus sign, enqueue it
+		if (isNumber(previousElement) && previousElement != "-" && previousSubstring == "-") {
+			output -> enqueue(previousSubstring);
+			substring = c;
+			previousElement = previousSubstring;
+			continue;
+		}
+
 
 		//if the previous substring is a number but the current isn't, it enqueue the number 
 		if (isNumber(previousSubstring) && !isNumber(substring)) {
@@ -195,10 +214,20 @@ bool isNumber(string input) {
 	   Conditions to be a number: 
 	   - There can only be one decimal point
 	   - Everything else must be a number
+	   - Negative sign can only be in front
 	   - Can't be empty
+	   - Can't be just a valid symbol
 	   */
 
 	if (input == "") {
+		return false;
+	}
+
+	if (input == "-") {
+		return false;
+	}
+	
+	if (input == ".") {
 		return false;
 	}
 
@@ -217,7 +246,8 @@ bool isNumber(string input) {
 				input[i] != '7' &&
 				input[i] != '8' &&
 				input[i] != '9' &&
-				input[i] != '.')
+				input[i] != '.' &&
+				input[i] != '-')
 		{
 			return false;
 		}
@@ -230,6 +260,11 @@ bool isNumber(string input) {
 		//update decimal boolean
 		if (input[i] == '.') {
 			decimalFound = true;
+		}
+
+		//negative sign check
+		if (input[i] == '-' && i != 0) {
+			return false;
 		}
 	}
 
@@ -364,7 +399,7 @@ Node<string>* postfixToTree(Queue<string>* postfix) {
 		//add this new tree to the stack again
 		treeStack -> push(parent);
 	}
-	
+
 	delete postfix;
 	return treeStack -> pop();
 }
@@ -405,15 +440,76 @@ void treeToPrefix(Queue<string>* &prefix, Node<string>* node) {
 }
 
 void treeToInfix(Queue<string>* &infix, Node<string>* node) {
-  //go all the way to the left, then start adding elements before going to the right
-  
-  if (node -> getLeft() != nullptr) {
-    treeToInfix(infix, node -> getLeft());
-  }
+	//go all the way to the left, then start adding elements before going to the right
 
-  infix -> enqueue(node -> getValue());
+	if (node -> getLeft() != nullptr) {
+		treeToInfix(infix, node -> getLeft());
+	}
 
-  if (node -> getRight() != nullptr) {
-    treeToInfix(infix, node -> getRight());
-  }
+	infix -> enqueue(node -> getValue());
+
+	if (node -> getRight() != nullptr) {
+		treeToInfix(infix, node -> getRight());
+	}
+}
+
+double solveFromTree(Node<string>* node) {
+	string value = node -> getValue();
+	
+	//if it is an operator, go get the children to use as operands
+	if (!isNumber(value) && validString(value)) {
+		double first = 0;
+		double second = 0;
+
+		if (node -> getLeft() != nullptr) {
+			first = solveFromTree(node -> getLeft());
+		}
+
+		if (node -> getRight() != nullptr) {
+			second = solveFromTree(node -> getRight());
+		}
+
+
+		//perform the actual operator 
+		if (value == "+") {
+			return first + second;
+		}
+		if (value == "-") {
+			return first - second;
+		}
+		if (value == "*") {
+			return first * second;
+		}
+		if (value == "/") {
+			return first / second;
+		}
+		if (value == "^") {
+			return pow(first, second);
+		}
+	}
+	
+	//must be a number, so return it for the operators further down
+	try {
+		return stod(node -> getValue());
+	}
+	catch (...) {
+		cout << "Fatal error." << endl;
+	}
+	return 0.0;
+}
+
+void deleteTree(Node<string>* node) {
+	//skip if the node is null for any reason
+	if (node == nullptr) {
+		return;
+	}
+
+	//delete all of the children before deleting self
+	if (node -> getLeft() != nullptr) {
+		deleteTree(node -> getLeft());
+	}
+	if (node -> getRight() != nullptr) {
+		deleteTree(node -> getRight());
+	}
+	delete node;
 }
