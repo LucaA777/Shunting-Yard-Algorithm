@@ -24,7 +24,7 @@ bool shouldPopStack(string newOperator, string stackOperator);
 Node<string>* postfixToTree(Queue<string>* postfix);
 string toLower(string str);
 void treeToPostfix(Stack<string>* &postfix, Node<string>* node);
-void treeToPrefix(Stack<string>* &prefix, Node<string>* node);
+void treeToPrefix(Queue<string>* &prefix, Node<string>* node);
 
 int main() {
 
@@ -68,12 +68,12 @@ int main() {
 		}
 
 		if (input == "prefix") {
-			Stack<string>* prefix = new Stack<string>();
+			Queue<string>* prefix = new Queue<string>();
 			treeToPrefix(prefix, tree);
 			cout << "Prefix: " << endl;
 
 			while (!prefix -> isEmpty()) {
-				cout << prefix -> pop() << " ";
+				cout << prefix -> dequeue() << " ";
 			}
 
 			cout << endl;
@@ -377,9 +377,9 @@ void treeToPostfix(Stack<string>* &postfix, Node<string>* node) {
 	}
 }
 
-void treeToPrefix(Stack<string>* &prefix, Node<string>* node) {
+void treeToPrefix(Queue<string>* &prefix, Node<string>* node) {
 	//go down the left branches until reaching the end, then start going right
-	prefix -> push(node -> getValue());
+	prefix -> enqueue(node -> getValue());
 
 	if (node -> getLeft() != nullptr) {
 		treeToPrefix(prefix, node -> getLeft());
