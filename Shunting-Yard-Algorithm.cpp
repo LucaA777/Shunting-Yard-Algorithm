@@ -25,6 +25,7 @@ Node<string>* postfixToTree(Queue<string>* postfix);
 string toLower(string str);
 void treeToPostfix(Stack<string>* &postfix, Node<string>* node);
 void treeToPrefix(Queue<string>* &prefix, Node<string>* node);
+void treeToInfix(Queue<string>* &infix, Node<string>* node);
 
 int main() {
 
@@ -80,6 +81,19 @@ int main() {
 			delete prefix;
 			continue;
 		}
+
+    if (input == "infix") {
+      Queue<string>* nInfix = new Queue<string>();
+      treeToInfix(nInfix, tree);
+      cout << "Infix: " << endl;
+
+      while (!nInfix -> isEmpty()) {
+        cout << nInfix -> dequeue() << " ";
+      }
+      cout << endl;
+      delete nInfix;
+      continue;
+    }
 
 		//if the input doesn't match a command, try converting it into an expression
 		if (createInfixFromString(input) == nullptr) {
@@ -388,4 +402,18 @@ void treeToPrefix(Queue<string>* &prefix, Node<string>* node) {
 	if (node -> getRight() != nullptr) {
 		treeToPrefix(prefix, node -> getRight());
 	}
+}
+
+void treeToInfix(Queue<string>* &infix, Node<string>* node) {
+  //go all the way to the left, then start adding elements before going to the right
+  
+  if (node -> getLeft() != nullptr) {
+    treeToInfix(infix, node -> getLeft());
+  }
+
+  infix -> enqueue(node -> getValue());
+
+  if (node -> getRight() != nullptr) {
+    treeToInfix(infix, node -> getRight());
+  }
 }
